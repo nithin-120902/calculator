@@ -1,3 +1,6 @@
+import 'package:calculator/request.dart';
+import 'package:calculator/response.dart';
+import 'package:calculator/validate.dart';
 import 'package:flutter/material.dart';
 
 void main(List<String> args) => runApp(const MyApp());
@@ -22,45 +25,44 @@ class Calculator extends StatefulWidget {
 
 class _CalculatorState extends State<Calculator> {
 
-  
+  Validate validate = Validate();
 
-  String display = "Hello World";
+  String display = "";
 
   
-  String reverseString(String str) {
-    String reversedString = "";
-    for (int i = str.length - 1; i >= 0; i--) {
-      reversedString += str[i];
-    }
-    return reversedString;
-  }
   void calculate(String value) {
     setState(() {
-      if (display == "" && (value == "c" || value == "ce")) {
-        display = "";
-      } else if (value == "="){
-         display=generateAnswer(display);
-      } else if (value == "c") {
-        display = display.substring(0, display.length - 1);
-      } else if (value == "ce") {
-        display = "";
-      } else if (value != "="){
-        display = display + value;
+      if(display!='Invalid Input'){
+        if (display == "" && (value == "c" || value == "ce")) {
+          display = "";
+        } else if (value == "=") {
+          Response res = validate.method1(Request(input: display));
+          display=res.output;
+        } else if (value == "c") {
+          display = display.substring(0, display.length - 1);
+        } else if (value == "ce") {
+          display = "";
+        } else {
+          if ((value == '+' || value == '-' || value == '*' || value == '/') &&
+              (display == '' ||
+                  display[display.length - 1] == '+' ||
+                  display[display.length - 1] == '-' ||
+                  display[display.length - 1] == '*' ||
+                  display[display.length - 1] == '/')) {
+            display = display;
+          } else {
+            display = display + value;
+          }
+        }
+      }
+      else{
+        if(value=='ce'||value=='c'){
+          display='';
+        }else{
+          display=value;
+        }
       }
     });
-  }
-
-  bool match(String input){
-    final alphanumeric = RegExp(r'^[+\-\/*%^]+$');
-    print(!(alphanumeric.hasMatch(input)));
-    return !(alphanumeric.hasMatch(input));
-  }
-
-  String generateAnswer(String input){
-    if(match(input)){
-      return input;
-    }
-    return "";
   }
 
   Widget generateButton(String btntxt, Color btncolor, Color txtColor) {
@@ -73,13 +75,13 @@ class _CalculatorState extends State<Calculator> {
         style: ElevatedButton.styleFrom(
           shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
           backgroundColor: btncolor,
-          padding: const EdgeInsets.all(25)
+          padding: const EdgeInsets.all(15)
         ),
         child: Text(
           btntxt,
           style: TextStyle(
             color: txtColor,
-            fontSize: 20,
+            fontSize: 30,
           ),
         ),
       ),
@@ -97,42 +99,34 @@ class _CalculatorState extends State<Calculator> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-           children: [
-             Expanded(
-               child: Container(
-                alignment: Alignment.bottomRight,
-                 child: 
-                 SingleChildScrollView(
-                    reverse: true,
-                   scrollDirection: Axis.horizontal,
-                   child: Text(display,
-                      
-                      textDirection: TextDirection.ltr,
-                       style: const TextStyle(color: Colors.white, fontSize: 30,letterSpacing:10)),
-                 ),
-               ),
+         Expanded(
+           child: Container(
+            alignment: Alignment.bottomRight,
+             child: 
+             SingleChildScrollView(
+                reverse: true,
+               scrollDirection: Axis.horizontal,
+               child: Text(display,
+                  
+                  textDirection: TextDirection.ltr,
+                   style: const TextStyle(color: Colors.white, fontSize: 40)
+                  ),
              ),
-           ],
+           ),
          ),
-          const SizedBox(
-            height:30
-          ),
+          // const SizedBox(
+          //   height:30
+          // ),
+           
           Row(
             children: [
               Expanded(child: generateButton('ce', Colors.grey, Colors.black)),
-
-              Expanded(child: generateButton('%', Colors.grey, Colors.black)),
-              
-              Expanded(child: generateButton('^', Colors.grey, Colors.black)),
-              
               Expanded(child: generateButton('/', Colors.amber[700]!, Colors.white)),
             ],
           ),
-          const SizedBox(
-            height:2,
-          ),
+          // const SizedBox(
+          //   height:2,
+          // ),
           Row(
             children: [
               Expanded(child: generateButton('7', Colors.grey[850]!, Colors.white)),
@@ -144,9 +138,9 @@ class _CalculatorState extends State<Calculator> {
               Expanded(child: generateButton('*', Colors.amber[700]!, Colors.white)),
             ],
           ),
-          const SizedBox(
-            height: 2,
-          ),
+          // const SizedBox(
+          //   height: 2,
+          // ),
           Row(
             
             children: [
@@ -159,9 +153,9 @@ class _CalculatorState extends State<Calculator> {
               Expanded(child: generateButton('-', Colors.amber[700]!, Colors.white)),
             ],
           ),
-          const SizedBox(
-            height: 2,
-          ),
+          // const SizedBox(
+          //   height: 2,
+          // ),
           Row(
             
             children: [
@@ -174,9 +168,9 @@ class _CalculatorState extends State<Calculator> {
               Expanded(child: generateButton('+', Colors.amber[700]!, Colors.white)),
             ],
           ),
-          const SizedBox(
-            height: 2,
-          ),
+          // const SizedBox(
+          //   height: 2,
+          // ),
           Row(
             
             children: [
